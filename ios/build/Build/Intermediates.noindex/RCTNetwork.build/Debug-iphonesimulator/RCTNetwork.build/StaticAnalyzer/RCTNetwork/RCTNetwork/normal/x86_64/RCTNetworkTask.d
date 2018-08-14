@@ -1,0 +1,10 @@
+dependencies: \
+  /Users/loipham/Desktop/Workspace/TPA/TPAOnline/TPAOnline/node_modules/react-native/Libraries/Network/RCTNetworkTask.m \
+  /Users/loipham/Desktop/Workspace/TPA/TPAOnline/TPAOnline/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTLog.h \
+  /Users/loipham/Desktop/Workspace/TPA/TPAOnline/TPAOnline/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTAssert.h \
+  /Users/loipham/Desktop/Workspace/TPA/TPAOnline/TPAOnline/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTDefines.h \
+  /Users/loipham/Desktop/Workspace/TPA/TPAOnline/TPAOnline/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTUtils.h \
+  /Users/loipham/Desktop/Workspace/TPA/TPAOnline/TPAOnline/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTNetworkTask.h \
+  /Users/loipham/Desktop/Workspace/TPA/TPAOnline/TPAOnline/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTURLRequestDelegate.h \
+  /Users/loipham/Desktop/Workspace/TPA/TPAOnline/TPAOnline/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTURLRequestHandler.h \
+  /Users/loipham/Desktop/Workspace/TPA/TPAOnline/TPAOnline/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTBridgeModule.h
