@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import ClaimInquiryComponent from "../components/ClaimInquiryComponent";
-import { GET_CERTIFICATE_LIST } from "../actions/actionTypes";
+import { CLAIM_INQUIRY_GET_CERTIFICATE_LIST, CLAIM_INQUIRY_GET_CERTIFICATE_INFO } from "../actions/actionTypes";
 
 const mapStateToProps = (state) => {
     const { userReducers, claimInquiryReducers } = state;
@@ -14,7 +14,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onSelectPolicy: (payload) => dispatch({ type: GET_CERTIFICATE_LIST, payload }),
+        onSelectPolicy: (payload) => dispatch({ type: CLAIM_INQUIRY_GET_CERTIFICATE_LIST, payload }),
+        onInquiryCertInfo: (payload) => dispatch({ type: CLAIM_INQUIRY_GET_CERTIFICATE_INFO, payload }),
     }
 }
 

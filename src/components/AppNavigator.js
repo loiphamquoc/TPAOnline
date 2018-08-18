@@ -11,6 +11,8 @@ import InitialComponent from "./InitialComponent";
 import SideMenuContainer from "./SideMenu";
 import ContactContainer from "../containers/ContactContainer";
 import ClaimInquiryContainer from "../containers/ClaimInquiryContainer";
+import ClaimHistoryContainer from "../containers/ClaimHistoryContainer";
+import ChangePasswordContainer from "../containers/ChangePasswordContainer";
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,7 +24,9 @@ const middleware = createReactNavigationReduxMiddleware(
 const AuthDrawer = createDrawerNavigator({
     Home: HomeContainer,
     ClaimInquiry: ClaimInquiryContainer,
+    ClaimHistory: ClaimHistoryContainer,
     Contact: ContactContainer,
+    ChangePassword: ChangePasswordContainer
 }, {
     drawerPosition: 'left',
     contentComponent: SideMenuContainer,

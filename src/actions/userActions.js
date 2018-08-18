@@ -1,4 +1,4 @@
-import { LOGIN, SET_GLOBAL_INDICATOR_VISIBILITY, GET_USER_PROFILE } from "./actionTypes";
+import { LOGIN, SET_GLOBAL_INDICATOR_VISIBILITY, GET_USER_PROFILE, CHANGE_PASSWORD } from "./actionTypes";
 import { Alert, AsyncStorage } from 'react-native';
 
 export const loginAction = (user) => {
@@ -12,6 +12,13 @@ export const getUserProfile = (token) => {
     return {
         type: GET_USER_PROFILE,
         token
+    };
+}
+
+export const changePassword = (data) => {
+    return {
+        type: CHANGE_PASSWORD,
+        data
     };
 }
 

@@ -200,14 +200,14 @@ export default class HomeComponent extends Component {
                         >
                         </DeckSwiper>
                     </View>
-                    <WebView
+                    {/* <WebView
                         style={{ flex: 10 }}
                         source={{ uri: 'http://localhost:8080/api-app/api/common/userGuide', headers :{
                             'Accept': 'application/json',
                             'Content-Type': 'application/json',
                             'Authorization': this.props.user.token
                         }}}
-                    />
+                    /> */}
                 </ScrollView>
                 <View
                     style={{

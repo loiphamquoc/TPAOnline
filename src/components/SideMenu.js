@@ -3,7 +3,7 @@ import { Dimensions, Platform } from "react-native";
 import { showRequestConfirm } from "../actions/userActions";
 import { View, Button, Icon, Text, ListItem, Left, Body, Right, Header, Title } from "native-base";
 import { connect } from "react-redux";
-import { LOGOUT, GET_POLICY_LIST } from "../actions/actionTypes";
+import { LOGOUT, CLAIM_INQUIRY_GET_POLICY_LIST, CLAIM_HISTORY_GET_POLICY_LIST } from "../actions/actionTypes";
 
 const { width, height } = Dimensions.get('window');
 
@@ -23,6 +23,10 @@ const listMenu = [
     {
         icon: 'stats',
         name: 'Biểu đồ'
+    },
+    {
+        icon: 'key',
+        name: 'Đổi mật khẩu'
     },
     {
         icon: 'information-circle',
@@ -52,13 +56,17 @@ class SideMenu extends Component {
                 this.props.goToClaimInquiryPage(this.props.user.token);
                 break;
             case 2:
+                this.props.goToClaimHistoryPage(this.props.user.token);
                 break;
             case 3:
                 break;
             case 4:
-                this.props.goToContactPage();
+                this.props.goToChangePasswordPage();
                 break;
             case 5:
+                this.props.goToContactPage();
+                break;
+            case 6:
                 this.logout();
                 break;
             default:
@@ -92,7 +100,7 @@ class SideMenu extends Component {
                 <View style={{ flex: 1 }}>
                     <Header>
                         <Body>
-                            <Title>Menu</Title>
+                            <Title>Danh mục</Title>
                         </Body>
                     </Header>
                     { listMenu.map((item, index) => this.renderListItemChild(item, index))}
@@ -104,9 +112,14 @@ class SideMenu extends Component {
 };
 
 const mapStateToProps = (state) => {
-    const { userReducers } = state;
+    const { userReducers, claimInquiryReducers, claimHistoryReducers } = state;
+    const user = userReducers;
+    const claimInquiry = claimInquiryReducers;
+    const claimHistory = claimHistoryReducers;
     return {
-        user: userReducers
+        user,
+        claimInquiry,
+        claimHistory
     };
 }
 
@@ -114,7 +127,9 @@ const mapDispatchToProps = (dispatch) => {
     return {
         onLogoutAction: () =>  dispatch({ type: LOGOUT }),
         goToHomePage: () => dispatch({ type: 'push', routeName: 'Home' }),
-        goToClaimInquiryPage: (token) => dispatch({ type: GET_POLICY_LIST, payload: token }),
+        goToClaimInquiryPage: (token) => dispatch({ type: CLAIM_INQUIRY_GET_POLICY_LIST, payload: token }),
+        goToClaimHistoryPage: (token) => dispatch({ type: CLAIM_HISTORY_GET_POLICY_LIST, payload: token }),
+        goToChangePasswordPage: () => dispatch({ type: 'push', routeName: 'ChangePassword' }),
         goToContactPage: () => dispatch({ type: 'push', routeName: 'Contact' }),
     }
 }

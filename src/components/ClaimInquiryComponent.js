@@ -1,37 +1,10 @@
 import React, { Component } from "react";
-import { View, Platform, Dimensions, ScrollView } from "react-native";
-import { Text, Header, Left, Button, Icon, Body, Title, Right, Label, Item, Picker, Input, Card, CardItem } from "native-base";
+import { View, Dimensions, ScrollView } from "react-native";
+import { Text, Header, Left, Button, Icon, Body, Title, Right, Card, CardItem } from "native-base";
 import ModalFilterPicker from "react-native-modal-filter-picker";
+import { showRequestAlert } from "../actions/userActions";
 
 const { width, height } = Dimensions.get('window');
-
-const options = [
-    {
-        key: 'kenya',
-        label: 'Kenya',
-        searchKey: 'Africa',
-    },
-    {
-        key: 'uganda',
-        label: 'Uganda',
-        searchKey: 'Africa',
-    },
-    {
-        key: 'libya',
-        label: 'Libya',
-        searchKey: 'Africa',
-    },
-    {
-        key: 'japan',
-        label: 'Japan',
-        searchKey: 'Asia',
-    },
-    {
-        key: 'estonia',
-        label: 'Estonia',
-        searchKey: 'Europe',
-    },
-];
 
 export default class ClaimInquiryComponent extends Component {
     constructor(props) {
@@ -46,7 +19,7 @@ export default class ClaimInquiryComponent extends Component {
             lsPolicy: [],
             lsCertificate: [],
             showInfo: false,
-            certInfo: {},
+            certificateInfo: {},
             showDetail: false,
             lsBenefit: []
         };
@@ -80,7 +53,11 @@ export default class ClaimInquiryComponent extends Component {
         this.setState({
             polCode: value,
             displayPolCode: displayPolCode,
-            visiblePol: false
+            visiblePol: false,
+            certNo: '',
+            displayCertNo: '',
+            showInfo: false,
+            showDetail: false
         })
         this.props.onSelectPolicy({
             token: this.props.user.token,
@@ -100,22 +77,34 @@ export default class ClaimInquiryComponent extends Component {
         this.setState({
             certNo: value,
             displayCertNo: displayCertNo,
-            visibleCert: false
+            visibleCert: false,
+            showInfo: false,
+            showDetail: false
         })
     }
 
     inquiryData() {
         const { polCode, certNo } = this.state;
+        if (!polCode || !certNo) {
+            showRequestAlert('Thông báo', 'Vui lòng chọn Hợp đồng và Nhân viên cần truy vấn!', () => {});
+            return;
+        }
+        this.props.onInquiryCertInfo({
+            token: this.props.user.token,
+            policyCode: polCode,
+            certificateNo: certNo
+        });
     }
 
     componentWillReceiveProps (nextProps) {
         if (nextProps.claimInquiry) {
+            // Update lsCertificate
             var lsCertificate = [];
-            const lsInStoreCertificate = this.props.claimInquiry.lsCertificate;
+            const lsInStoreCertificate = nextProps.claimInquiry.lsCertificate;
             if (lsInStoreCertificate) {
                 lsInStoreCertificate.map((item, index) => {
                     lsCertificate.push({
-                        key: item.certId,
+                        key: item.certificateId,
                         label: item.lastName
                     });
                 });
@@ -123,42 +112,89 @@ export default class ClaimInquiryComponent extends Component {
             this.setState({
                 lsCertificate: lsCertificate
             });
+            // Update certificateInfo
+            var certificateInfo = {};
+            const inStoreCertificateInfo = nextProps.claimInquiry.certificateInfo;
+            if (inStoreCertificateInfo) {
+                certificateInfo = {
+                    certificateNo: inStoreCertificateInfo.certificateId,
+                    identityNo: inStoreCertificateInfo.idNo,
+                    certificateName: inStoreCertificateInfo.lastName,
+                    classCode: inStoreCertificateInfo.classcode,
+                    effectiveDateFrom: inStoreCertificateInfo.effectivefromdate,
+                    effectiveDateTo: inStoreCertificateInfo.effectivetodate
+                }
+            }
+            this.setState({
+                certificateInfo: certificateInfo,
+                showInfo: certificateInfo.certificateNo
+            });
+            // Update lsBenefit
+            var lsBenefit = [];
+            const lsInStoreBenefit = nextProps.claimInquiry.lsBenefit;
+            if (lsInStoreBenefit) {
+                lsInStoreBenefit.map((item, index) => {
+                    lsBenefit.push({
+                        benefitCode: item.benefitCode,
+                        benefitName: item.benefitNameV,
+                        maxaType: item.maxaType,
+                        maxaValue: item.maxaValue,
+                        avMaxaValue: item.availableAmount,
+                        limitType: item.limitType,
+                        limitValue: item.limitValue,
+                        avLimitValue: item.availableLimit,
+                        maxiType: item.maxiType,
+                        maxiValue: item.maxiValue,
+                        avMaxiValue: item.availableAmountMaxi,
+                    });
+                });
+            }
+            this.setState({
+                lsBenefit: lsBenefit,
+                showDetail: lsBenefit.length > 0
+            });
         }
     }
+    
     renderInfo() {
         if (this.state.showInfo) {
-            const { certInfo } = this.state;
+            const { certificateInfo } = this.state;
             return (
                 <View style={{ flex: 20 }}>
+                    <Text
+                        style={[ {
+                            fontFamily: 'Helvetica',
+                            fontSize: 18,
+                            fontWeight: "500",
+                            margin: 10,
+                        }, this.props.style ]}
+                    >Thông tin nhân viên</Text>
                     <Card>
-                        <CardItem header>
-                            <Text>Thông tin nhân viên</Text>
-                        </CardItem>
                         <CardItem cardBody>
                             <Body style={[ {padding: 5, margin: 5}, this.props.style ]}>
                                 <View style={{ flexDirection: 'row' }}>
                                     <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Mã số nhân viên: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certInfo.certificateNo }</Text>
+                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.certificateNo }</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
                                     <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>CMND: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certInfo.identityNo }</Text>
+                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.identityNo }</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
                                     <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Họ tên nhân viên: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certInfo.certificateName }</Text>
+                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.certificateName }</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
                                     <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Nhóm: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certInfo.classCode }</Text>
+                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.classCode }</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
                                     <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Hiệu lực từ: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certInfo.effectiveDateFrom }</Text>
+                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.effectiveDateFrom }</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
                                     <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Hiệu lực đến: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certInfo.effectiveDateTo }</Text>
+                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.effectiveDateTo }</Text>
                                 </View>
                             </Body>
                         </CardItem>
@@ -175,26 +211,31 @@ export default class ClaimInquiryComponent extends Component {
             const { lsBenefit, style } = this.state;
             return (
                 <View style={{ flex: 50 }}>
+                    <Text
+                        style={[ {
+                            fontFamily: 'Helvetica',
+                            fontSize: 18,
+                            fontWeight: "500",
+                            margin: 10,
+                        }, this.props.style ]}
+                    >Thông tin quyền lợi</Text>
                         {
                             lsBenefit.map((item, index) => {
                                 return <Card key={item.benefitCode}>
-                                    <CardItem header>
-                                        <Text>Thông tin quyền lợi</Text>
-                                    </CardItem>
                                     <CardItem cardBody>
                                         <Body style={[ {padding: 5, margin: 5}, style ]}>
                                             <View>
-                                                <Text style={[ { fontFamily: 'Helvetica', textDecorationLine: 'underline' }, this.props.style ]}>{ item.benefitName }</Text>
+                                                <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ "Quyền lợi BH: " + item.benefitName }</Text>
                                             </View>
-                                            { item.maxaType ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]} >{ item.maxaType }</Text></View> : null }
-                                            { item.maxaValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "-Tổng: " + item.maxaValue }</Text></View> : null }
-                                            { item.avMaxaValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "-Còn: " + item.avMaxaValue }</Text></View> : null }
-                                            { item.limitType ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ item.limitType }</Text></View> : null }
-                                            { item.limitValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "-Tổng: " + item.limitValue }</Text></View> : null }
-                                            { item.avLimitValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "-Còn: " + item.avLimitValue }</Text></View> : null }
-                                            { item.maxiType ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ item.maxiType }</Text></View> : null }
-                                            { item.maxiValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "-Tổng: " + item.maxiValue }</Text></View> : null }
-                                            { item.avMaxiValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "-Còn: " + item.avMaxiValue }</Text></View> : null }
+                                            { item.maxaType ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]} >{ "- " + item.maxaType }</Text></View> : null }
+                                            { item.maxaValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Tổng: " + item.maxaValue }</Text></View> : null }
+                                            { item.avMaxaValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Còn: " + item.avMaxaValue }</Text></View> : null }
+                                            { item.limitType ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ "- " + item.limitType }</Text></View> : null }
+                                            { item.limitValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Tổng: " + item.limitValue }</Text></View> : null }
+                                            { item.avLimitValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Còn: " + item.avLimitValue }</Text></View> : null }
+                                            { item.maxiType ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ "- " + item.maxiType }</Text></View> : null }
+                                            { item.maxiValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Tổng: " + item.maxiValue }</Text></View> : null }
+                                            { item.avMaxiValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Còn: " + item.avMaxiValue }</Text></View> : null }
                                         </Body>
                                     </CardItem>
                                 </Card>

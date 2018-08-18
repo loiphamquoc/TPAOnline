@@ -75,3 +75,88 @@ export function doGetCertificateList(criteria) {
     });
     return response;
 }
+
+export function doGetCertificateInfo(criteria) {
+    const url = `${baseUrl}/claim/loadCertificateDetails`;
+    const response = fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': criteria.token,
+        },
+        body: JSON.stringify({
+            '_poNo': criteria.policyCode,
+            '_cerNo': criteria.certificateNo
+        })
+    }).then(response => {
+        return response;
+    }).catch(err => {
+        return err;
+    });
+    return response;
+}
+
+export function doGetLsClaimBenefit(criteria) {
+    const url = `${baseUrl}/claim/loadBenefitInquiryDetails`;
+    const response = fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': criteria.token,
+        },
+        body: JSON.stringify({
+            '_poNo': criteria.policyCode,
+            '_cerNo': criteria.certificateNo
+        })
+    }).then(response => {
+        return response;
+    }).catch(err => {
+        return err;
+    });
+    return response;
+}
+
+export function doGetLsClaimHistory(criteria) {
+    const url = `${baseUrl}/claim/loadClaimDetails`;
+    const response = fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': criteria.token,
+        },
+        body: JSON.stringify({
+            '_poNo': criteria.policyCode,
+            '_cerNo': criteria.certificateNo
+        })
+    }).then(response => {
+        return response;
+    }).catch(err => {
+        return err;
+    });
+    return response;
+}
+
+export function doChangePassword(data) {
+    const url = `${baseUrl}/user/saveChangePassword`;
+    const response = fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': data.token,
+        },
+        body: JSON.stringify({
+            '_oldPassword': data.curPassword,
+            '_newPassword': data.newPassword,
+            '_confirmPassword': data.reNewPassword
+        })
+    }).then(response => {
+        return response;
+    }).catch(err => {
+        return err;
+    });
+    return response;
+}

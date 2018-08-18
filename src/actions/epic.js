@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
-import { doLogin, doGetUserProfile, doGetPolicyList, doGetCertificateList } from "./Api";
-import { LOGIN, LOGIN_SUCCESS, LOGIN_FAILED, SET_GLOBAL_INDICATOR_VISIBILITY, LOGOUT, GET_USER_PROFILE, GET_USER_PROFILE_SUCCESS, GET_POLICY_LIST, GET_POLICY_LIST_SUCCESS, GET_CERTIFICATE_LIST, GET_CERTIFICATE_LIST_SUCCESS } from "../actions/actionTypes";
+import { doLogin, doGetUserProfile, doGetPolicyList, doGetCertificateList, doGetCertificateInfo, doGetLsClaimBenefit, doGetLsClaimHistory, doChangePassword } from "./Api";
+import { LOGIN, LOGIN_SUCCESS, LOGIN_FAILED, SET_GLOBAL_INDICATOR_VISIBILITY, LOGOUT, GET_USER_PROFILE, GET_USER_PROFILE_SUCCESS, CLAIM_INQUIRY_GET_POLICY_LIST, CLAIM_INQUIRY_GET_POLICY_LIST_SUCCESS, CLAIM_INQUIRY_GET_CERTIFICATE_LIST, CLAIM_INQUIRY_GET_CERTIFICATE_LIST_SUCCESS, CLAIM_INQUIRY_GET_CERTIFICATE_INFO, CLAIM_INQUIRY_GET_CERTIFICATE_INFO_SUCCESS, CLAIM_INQUIRY_GET_CLAIM_BENEFIT_SUCCESS, CLAIM_HISTORY_GET_POLICY_LIST, CLAIM_HISTORY_GET_POLICY_LIST_SUCCESS, CLAIM_HISTORY_GET_CERTIFICATE_LIST, CLAIM_HISTORY_GET_CERTIFICATE_LIST_SUCCESS, CLAIM_HISTORY_GET_CERTIFICATE_INFO, CLAIM_HISTORY_GET_CERTIFICATE_INFO_SUCCESS, CLAIM_HISTORY_GET_CLAIM_HISTORY_SUCCESS, CHANGE_PASSWORD, CHANGE_PASSWORD_SUCCESS, CHANGE_PASSWORD_FAILED } from "../actions/actionTypes";
 import { showRequestAlert, setToken, clearToken } from "./userActions";
 
 export default function (action$, store) {
@@ -40,7 +40,7 @@ export default function (action$, store) {
             Observable.of({ type: SET_GLOBAL_INDICATOR_VISIBILITY, visible: false })
           );
         } else {
-          setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 3000)
+          setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 1000)
           clearToken();
           return Observable.concat(
             Observable.of({ type: 'push', routeName: 'Auth' })
@@ -50,18 +50,18 @@ export default function (action$, store) {
     })
   });
 
-  const getPolicyList$ = action$.ofType(GET_POLICY_LIST).switchMap((action) => {
+  const getClaimInquiryPolicyList$ = action$.ofType(CLAIM_INQUIRY_GET_POLICY_LIST).switchMap((action) => {
     return Observable.fromPromise(doGetPolicyList(action.payload)).mergeMap((responseData) => {
         if (responseData) {
           if (responseData.status === 200) {
             const bodyInit = JSON.parse(responseData._bodyInit);
             const data = bodyInit.result.data;
             return Observable.concat(
-              Observable.of({ type: GET_POLICY_LIST_SUCCESS, payload: { lsPolicy: data } }),
+              Observable.of({ type: CLAIM_INQUIRY_GET_POLICY_LIST_SUCCESS, payload: { lsPolicy: data } }),
               Observable.of({ type: 'push', routeName: 'ClaimInquiry' }),
             )
           } else {
-            setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 3000)
+            setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 1000)
             clearToken();
             return Observable.concat(
               Observable.of({ type: 'push', routeName: 'Auth' })
@@ -71,20 +71,168 @@ export default function (action$, store) {
       })
   });
 
-  const getCertificateList$ = action$.ofType(GET_CERTIFICATE_LIST).switchMap((action) => {
+  const getClaimInquiryCertificateList$ = action$.ofType(CLAIM_INQUIRY_GET_CERTIFICATE_LIST).switchMap((action) => {
     return Observable.fromPromise(doGetCertificateList(action.payload)).mergeMap((responseData) => {
         if (responseData) {
           if (responseData.status === 200) {
             const bodyInit = JSON.parse(responseData._bodyInit);
             const data = bodyInit.result.data;
             return Observable.concat(
-              Observable.of({ type: GET_CERTIFICATE_LIST_SUCCESS, payload: { lsCertificate: data } }),
+              Observable.of({ type: CLAIM_INQUIRY_GET_CERTIFICATE_LIST_SUCCESS, payload: { lsCertificate: data } }),
             )
           } else {
-            setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 3000)
+            setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 1000)
             clearToken();
             return Observable.concat(
               Observable.of({ type: 'push', routeName: 'Auth' }),
+            );
+          }
+        }
+      })
+  });
+
+  const getClaimInquiryCertificateInfo$ = action$.ofType(CLAIM_INQUIRY_GET_CERTIFICATE_INFO).switchMap((action) => {
+    return Observable.fromPromise(doGetCertificateInfo(action.payload)).mergeMap((responseData) => {
+        if (responseData) {
+          if (responseData.status === 200) {
+            const bodyInit = JSON.parse(responseData._bodyInit);
+            const result = bodyInit.result;
+            return Observable.concat(
+              Observable.of({ type: CLAIM_INQUIRY_GET_CERTIFICATE_INFO_SUCCESS, payload: { certificateInfo: result } }),
+              Observable.fromPromise(doGetLsClaimBenefit(action.payload)).mergeMap((responseData) => {
+                if (responseData.status === 200) {
+                  const bodyInit = JSON.parse(responseData._bodyInit);
+                  const result = bodyInit.result;
+                  var data = [];
+                  if (result.data) {
+                    data = result.data;
+                  }
+                  return Observable.concat(
+                    Observable.of({ type: CLAIM_INQUIRY_GET_CLAIM_BENEFIT_SUCCESS, payload: { lsBenefit: data } }),
+                  )
+                } else {
+                  setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 1000)
+                  clearToken();
+                  return Observable.concat(
+                    Observable.of({ type: 'push', routeName: 'Auth' }),
+                  );
+                }
+              })
+            )
+          } else {
+            setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 1000)
+            clearToken();
+            return Observable.concat(
+              Observable.of({ type: 'push', routeName: 'Auth' }),
+            );
+          }
+        }
+      })
+  });
+
+  const getClaimHistoryPolicyList$ = action$.ofType(CLAIM_HISTORY_GET_POLICY_LIST).switchMap((action) => {
+    return Observable.fromPromise(doGetPolicyList(action.payload)).mergeMap((responseData) => {
+        if (responseData) {
+          if (responseData.status === 200) {
+            const bodyInit = JSON.parse(responseData._bodyInit);
+            const data = bodyInit.result.data;
+            return Observable.concat(
+              Observable.of({ type: CLAIM_HISTORY_GET_POLICY_LIST_SUCCESS, payload: { lsPolicy: data } }),
+              Observable.of({ type: 'push', routeName: 'ClaimHistory' }),
+            )
+          } else {
+            setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 1000)
+            clearToken();
+            return Observable.concat(
+              Observable.of({ type: 'push', routeName: 'Auth' })
+            );
+          }
+        }
+      })
+  });
+
+  const getClaimHistoryCertificateList$ = action$.ofType(CLAIM_HISTORY_GET_CERTIFICATE_LIST).switchMap((action) => {
+    return Observable.fromPromise(doGetCertificateList(action.payload)).mergeMap((responseData) => {
+        if (responseData) {
+          if (responseData.status === 200) {
+            const bodyInit = JSON.parse(responseData._bodyInit);
+            const data = bodyInit.result.data;
+            return Observable.concat(
+              Observable.of({ type: CLAIM_HISTORY_GET_CERTIFICATE_LIST_SUCCESS, payload: { lsCertificate: data } }),
+            )
+          } else {
+            setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 1000)
+            clearToken();
+            return Observable.concat(
+              Observable.of({ type: 'push', routeName: 'Auth' }),
+            );
+          }
+        }
+      })
+  });
+
+  const getClaimHistoryCertificateInfo$ = action$.ofType(CLAIM_HISTORY_GET_CERTIFICATE_INFO).switchMap((action) => {
+    return Observable.fromPromise(doGetCertificateInfo(action.payload)).mergeMap((responseData) => {
+        if (responseData) {
+          if (responseData.status === 200) {
+            const bodyInit = JSON.parse(responseData._bodyInit);
+            const result = bodyInit.result;
+            return Observable.concat(
+              Observable.of({ type: CLAIM_HISTORY_GET_CERTIFICATE_INFO_SUCCESS, payload: { certificateInfo: result } }),
+              Observable.fromPromise(doGetLsClaimHistory(action.payload)).mergeMap((responseData) => {
+                if (responseData.status === 200) {
+                  const bodyInit = JSON.parse(responseData._bodyInit);
+                  const result = bodyInit.result;
+                  var data = [];
+                  if (result.data) {
+                    data = result.data;
+                  }
+                  return Observable.concat(
+                    Observable.of({ type: CLAIM_HISTORY_GET_CLAIM_HISTORY_SUCCESS, payload: { lsClaimHistory: data } }),
+                  )
+                } else {
+                  setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 1000)
+                  clearToken();
+                  return Observable.concat(
+                    Observable.of({ type: 'push', routeName: 'Auth' }),
+                  );
+                }
+              })
+            )
+          } else {
+            setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 1000)
+            clearToken();
+            return Observable.concat(
+              Observable.of({ type: 'push', routeName: 'Auth' }),
+            );
+          }
+        }
+      })
+  });
+
+  const changePassword$ = action$.ofType(CHANGE_PASSWORD).switchMap((action) => {
+    return Observable.fromPromise(doChangePassword(action.payload)).mergeMap((responseData) => {
+        if (responseData) {
+          if (responseData.status === 200) {
+            const bodyInit = JSON.parse(responseData._bodyInit);
+            const data = bodyInit.result.subErrors;
+            if (data && data.length > 0) {
+              showRequestAlert("Thông báo", "Thông tin không chính xác! Vui lòng thử lại!", () => { })
+              return Observable.concat(
+                Observable.of({ type: CHANGE_PASSWORD_FAILED, payload: { isChangedPassSuccess: false } }),
+              );
+            } else {
+              setTimeout(() => { showRequestAlert("Thông báo", "Đổi mật khẩu thành công! Vui lòng thực hiện đăng nhập lại!", () => { }) }, 1000);
+              clearToken();
+              return Observable.concat(
+                Observable.of({ type: 'push', routeName: 'Auth' })
+              );
+            }
+          } else {
+            setTimeout(() => { showRequestAlert("Thông báo", "Phiên làm việc đã hết hạn! Vui lòng đăng nhập lại", () => { }) }, 1000)
+            clearToken();
+            return Observable.concat(
+              Observable.of({ type: 'push', routeName: 'Auth' })
             );
           }
         }
@@ -101,8 +249,13 @@ export default function (action$, store) {
   return Observable.merge(
     login$,
     getUserProfile$,
-    getPolicyList$,
-    getCertificateList$,
+    getClaimInquiryPolicyList$,
+    getClaimInquiryCertificateList$,
+    getClaimInquiryCertificateInfo$,
+    getClaimHistoryPolicyList$,
+    getClaimHistoryCertificateList$,
+    getClaimHistoryCertificateInfo$,
+    changePassword$,
     logout$,
   ).do(func => { console.log('epic', func); });
 }

@@ -1,29 +1,27 @@
 import React, { Component } from "react";
-import { LOGIN } from "../actions/actionTypes";
-import { View, StyleSheet, AsyncStorage, Platform, ImageBackground, TouchableOpacity } from "react-native";
-import { Button, Text, Container, Header, Content, Item, Form, Label, Input, Picker, Icon  } from "native-base";
-import { connect } from 'react-redux'
+import { View, StyleSheet, ImageBackground, TouchableOpacity } from "react-native";
+import { Text, Item, Label, Input, Picker, Icon  } from "native-base";
 import IndicatorDialog from "../common/IndicatorDialog";
 
 const pickerValues = [
     {
-        label: 'Employee',
+        label: 'Nhân viên',
         value: 'CERTIFICATE'
     },
     {
-        label: 'Human Resources',
+        label: 'Nhân sự',
         value: 'HR_POLICY'
     },
     {
-        label: 'Insurance',
+        label: 'Nhà bảo hiểm',
         value: 'TPA'
     },
     {
-        label: 'Broker',
+        label: 'Môi giới bảo hiểm',
         value: 'BROKER'
     },
     {
-        label: 'Hospital',
+        label: 'Bệnh viện',
         value: 'HOSPITAL'
     }
 ];
@@ -41,7 +39,7 @@ export default class LoginComponent extends Component {
     onLogin() {
         const { username, password, loginType } = this.state;
         if (!username || !password) {
-            alert('You must enter Username and Password');
+            alert('Vui lòng nhập Tên đăng nhập và Mật khẩu!');
             return;
         }
         this.props.onLoginAction({
@@ -75,15 +73,16 @@ export default class LoginComponent extends Component {
                                 }}>Online</Text>
                             </View>
                             <Item picker>
-                                <Label>Login Role</Label>
+                                <Label>Vai trò</Label>
                                 <Picker
                                     mode="dropdown"
-                                    iosHeader="Select your Login role"
+                                    iosHeader="Chọn vai trò"
                                     iosIcon={ <Icon name="ios-arrow-down-outline" /> }
                                     style={{ width: 220 }}
                                     placeholder={this.state.loginType}
                                     selectedValue={this.state.loginType}
                                     onValueChange={(value, index) => this.setState({ loginType: value })}
+                                    headerBackButtonText={"Trở về"}
                                 >
                                     { pickerValues.map((item, index) => {
                                         return <Picker.Item key={item.value} label={item.label} value={item.value} />
@@ -146,7 +145,7 @@ export default class LoginComponent extends Component {
                                             fontSize: 13,
                                             fontFamily: 'Helvetica',
                                     }}>
-                                        LOGIN
+                                        ĐĂNG NHẬP
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -158,7 +157,7 @@ export default class LoginComponent extends Component {
                                         color: '#007bff',
                                         textDecorationLine: 'underline'
                                     }}>
-                                        Forgot password?
+                                        Quên mật khẩu?
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity>
@@ -168,7 +167,7 @@ export default class LoginComponent extends Component {
                                         color: '#007bff',
                                         textDecorationLine: 'underline'
                                     }}>
-                                        Register
+                                        Đăng ký
                                     </Text>
                                 </TouchableOpacity>
                             </View>
