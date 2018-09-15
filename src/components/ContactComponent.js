@@ -14,9 +14,9 @@ export default class ContactComponent extends Component {
                 <Header>
                     <Left>
                         <Button transparent onPress={() => {
-                            this.props.navigation.toggleDrawer();
+                            this.props.goToHomePage();
                         }} >
-                            <Icon name="menu" />
+                            <Icon name="arrow-back" />
                         </Button>
                     </Left>
                     <Body>

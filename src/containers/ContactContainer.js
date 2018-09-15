@@ -10,7 +10,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        
+        goToHomePage: () => dispatch({ type: 'push', routeName: 'Home' }),
     }
 }
 

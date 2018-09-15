@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Platform, Image, Text, ScrollView, TouchableHighlight, Dimensions, Linking, AsyncStorage, WebView } from "react-native";
+import { View, Platform, Image, Text, ScrollView, TouchableHighlight, Dimensions, Linking, AsyncStorage, WebView, TouchableOpacity } from "react-native";
 import { Button, Container, Header, Content, Form, Label, Input, Icon, Left, Right, Body, Title, DeckSwiper, Card, CardItem, FooterTab, Footer } from "native-base";
 
 const homePageDocuments = [
@@ -80,30 +80,6 @@ export default class HomeComponent extends Component {
             default:
                 break;
         }
-
-        // fetch(fetchUrl, {
-        //     method: 'GET',
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json',
-        //         'Authorization': this.props.user.token
-        //     }
-        // }).then(response => {
-        //     return <WebView source={{ uri: fetchUrl, headers :{
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json',
-        //         'Authorization': this.props.user.token
-        //     }}} />
-        // }).catch(err => {
-        //     console.log(err)
-        // });
-        // Linking.openURL(fetchUrl).catch(err => console.error('An error occurred', err));
-
-        <WebView source={{ uri: fetchUrl, headers :{
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': this.props.user.token
-        }}} />
     }
 
     renderSlideItem(item) {
@@ -192,22 +168,85 @@ export default class HomeComponent extends Component {
                         />
                     </View>
                     <View
-                        style={{ flex: 8, margin: 10 }}
+                        style={{ flex: 8 }}
                     >
-                        <DeckSwiper
-                            dataSource={homePageDocuments}
-                            renderItem={item => this.renderSlideItem(item)}
+                        <View
+                            style={{ flex: 5, flexDirection: 'row' }}
                         >
-                        </DeckSwiper>
+                            <TouchableOpacity
+                                style={{ flex: 5, borderColor: 'gray', borderWidth: 1, borderBottomWidth: 0, height: 140 }}
+                                onPress={() => {
+                                    this.props.goToClaimInquiryPage(this.props.user.token);
+                                }}
+                            >
+                                <View
+                                    style={{ alignItems: 'center', justifyContent: 'center', paddingTop: 40 }}
+                                >
+                                    <Icon name="person" />
+                                    <Text
+                                        style={{ fontFamily: 'Helvetica' }}
+                                    >
+                                        Thông tin cá nhân
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ flex: 5, borderColor: 'gray', borderWidth: 1, borderBottomWidth: 0, height: 140 }}
+                                onPress={() => {
+                                    this.props.goToClaimHistoryPage(this.props.user.token);
+                                }}
+                            >
+                                <View
+                                    style={{ alignItems: 'center', justifyContent: 'center', paddingTop: 40 }}
+                                >
+                                    <Icon name="paper" />
+                                    <Text
+                                        style={{ fontFamily: 'Helvetica' }}
+                                    >
+                                        Lịch sử bồi thường
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <View
+                            style={{ flex: 5, flexDirection: 'row' }}
+                        >
+                            <TouchableOpacity
+                                style={{ flex: 5, borderColor: 'gray', borderWidth: 1, height: 140 }}
+                                onPress={() => {
+                                    this.props.goToHospitalPage({token : this.props.user.token});
+                                }}
+                            >
+                                <View
+                                    style={{ alignItems: 'center', justifyContent: 'center', paddingTop: 40 }}
+                                >
+                                    <Icon name="medkit" />
+                                    <Text
+                                        style={{ fontFamily: 'Helvetica' }}
+                                    >
+                                        DS Bệnh viện/Phòng khám
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ flex: 5, borderColor: 'gray', borderWidth: 1, height: 140 }}
+                                onPress={() => {
+                                    this.props.goToContactPage();
+                                }}
+                            >
+                                <View
+                                    style={{ alignItems: 'center', justifyContent: 'center', paddingTop: 40 }}
+                                >
+                                    <Icon name="information-circle" />
+                                    <Text
+                                        style={{ fontFamily: 'Helvetica' }}
+                                    >
+                                        Liên hệ
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    {/* <WebView
-                        style={{ flex: 10 }}
-                        source={{ uri: 'http://localhost:8080/api-app/api/common/userGuide', headers :{
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                            'Authorization': this.props.user.token
-                        }}}
-                    /> */}
                 </ScrollView>
                 <View
                     style={{

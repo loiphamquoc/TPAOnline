@@ -7,38 +7,88 @@ import { LOGOUT, CLAIM_INQUIRY_GET_POLICY_LIST, CLAIM_HISTORY_GET_POLICY_LIST } 
 
 const { width, height } = Dimensions.get('window');
 
-const listMenu = [
-    {
-        icon: 'home',
-        name: 'Trang chủ'
-    },
-    {
-        icon: 'search',
-        name: 'Truy vấn quyền lợi'
-    },
-    {
-        icon: 'paper',
-        name: 'Lịch sử bồi thường'
-    },
-    {
-        icon: 'stats',
-        name: 'Biểu đồ'
-    },
-    {
-        icon: 'key',
-        name: 'Đổi mật khẩu'
-    },
-    {
-        icon: 'information-circle',
-        name: 'Liên hệ'
-    },
-    {
-        icon: 'arrow-round-back',
-        name: 'Đăng xuất'
-    }
-];
+const listMenu = [];
 
 class SideMenu extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            token: this.props.user.token,
+            loginType: null,
+            listMenu: []
+        };
+    }
+    
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.user) {
+            const { loginType } = nextProps.user;
+            var listMenuTmp = [];
+            switch(loginType) {
+                case 'TPA':
+                    listMenuTmp = [
+                        { icon: 'home', name: 'Trang chủ' },
+                        { icon: 'person', name: 'Thông tin cá nhân' },
+                        { icon: 'paper', name: 'Lịch sử bồi thường' },
+                        { icon: 'add-circle', name: 'DS Bệnh viện/Phòng khám' },
+                        { icon: 'stats', name: 'Biểu đồ' },
+                        { icon: 'key', name: 'Đổi mật khẩu' },
+                        { icon: 'information-circle', name: 'Liên hệ' },
+                        { icon: 'arrow-round-back', name: 'Đăng xuất' }
+                    ];
+                    break;
+                case 'CERTIFICATE':
+                    listMenuTmp = [
+                        { icon: 'home', name: 'Trang chủ' },
+                        // { icon: 'person', name: 'Thông tin cá nhân' },
+                        // { icon: 'paper', name: 'Lịch sử bồi thường' },
+                        // { icon: 'add-circle', name: 'DS Bệnh viện/Phòng khám' },
+                        { icon: 'key', name: 'Đổi mật khẩu' },
+                        { icon: 'information-circle', name: 'Liên hệ' },
+                        { icon: 'arrow-round-back', name: 'Đăng xuất' }
+                    ];
+                    break;
+                case 'POLICY':
+                    listMenuTmp = [
+                        { icon: 'home', name: 'Trang chủ' },
+                        { icon: 'person', name: 'Thông tin cá nhân' },
+                        { icon: 'paper', name: 'Lịch sử bồi thường' },
+                        { icon: 'add-circle', name: 'DS Bệnh viện/Phòng khám' },
+                        { icon: 'key', name: 'Đổi mật khẩu' },
+                        { icon: 'information-circle', name: 'Liên hệ' },
+                        { icon: 'arrow-round-back', name: 'Đăng xuất' }
+                    ];
+                    break;
+                case 'BROKER':
+                    listMenuTmp = [
+                        { icon: 'home', name: 'Trang chủ' },
+                        { icon: 'add-circle', name: 'DS Bệnh viện/Phòng khám' },
+                        { icon: 'stats', name: 'Biểu đồ' },
+                        { icon: 'key', name: 'Đổi mật khẩu' },
+                        { icon: 'information-circle', name: 'Liên hệ' },
+                        { icon: 'arrow-round-back', name: 'Đăng xuất' }
+                    ];
+                    break;
+                case 'HOSPITAL':
+                    listMenuTmp = [
+                        { icon: 'home', name: 'Trang chủ' },
+                        { icon: 'person', name: 'Thông tin cá nhân' },
+                        { icon: 'add-circle', name: 'DS Bệnh viện/Phòng khám' },
+                        { icon: 'key', name: 'Đổi mật khẩu' },
+                        { icon: 'information-circle', name: 'Liên hệ' },
+                        { icon: 'arrow-round-back', name: 'Đăng xuất' }
+                    ];
+                    break;
+                default:
+                    break;
+            }
+            this.setState({
+                listMenu: listMenuTmp,
+                loginType: loginType
+            });
+        }
+    }
+        
 
     logout() {
         showRequestConfirm('Thông báo', 'Bạn có chắc muốn đăng xuất ?', () => {
@@ -48,30 +98,154 @@ class SideMenu extends Component {
 
     onClickMenu(index) {
         this.props.navigation.navigate('DrawerClose');
-        switch(index) {
-            case 0:
-                this.props.goToHomePage();
+        const { loginType } = this.state;
+        switch(loginType) {
+            case 'TPA':
+                switch(index) {
+                    case 0:
+                        this.props.goToHomePage();
+                        break;
+                    case 1:
+                        this.props.goToClaimInquiryPage(this.props.user.token);
+                        break;
+                    case 2:
+                        this.props.goToClaimHistoryPage(this.props.user.token);
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        this.props.goToChangePasswordPage();
+                        break;
+                    case 6:
+                        this.props.goToContactPage();
+                        break;
+                    case 7:
+                        this.logout();
+                        break;
+                    default:
+                        break;
+                }
                 break;
-            case 1:
-                this.props.goToClaimInquiryPage(this.props.user.token);
+            // case 'CERTIFICATE':
+            //     switch(index) {
+            //         case 0:
+            //             this.props.goToHomePage();
+            //             break;
+            //         case 1:
+            //             this.props.goToClaimInquiryPage(this.props.user.token);
+            //             break;
+            //         case 2:
+            //             this.props.goToClaimHistoryPage(this.props.user.token);
+            //             break;
+            //         case 3:
+            //             break;
+            //         case 4:
+            //             this.props.goToChangePasswordPage();
+            //             break;
+            //         case 5:
+            //             this.props.goToContactPage();
+            //             break;
+            //         case 6:
+            //             this.logout();
+            //             break;
+            //         default:
+            //             break;
+            //     }
+            //     break;
+            case 'CERTIFICATE':
+                switch(index) {
+                    case 0:
+                        this.props.goToHomePage();
+                        break;
+                    case 1:
+                        this.props.goToChangePasswordPage();
+                        break;
+                    case 2:
+                        this.props.goToContactPage();
+                        break;
+                    case 3:
+                        this.logout();
+                        break;
+                    default:
+                        break;
+                }
                 break;
-            case 2:
-                this.props.goToClaimHistoryPage(this.props.user.token);
+            case 'POLICY':
+                switch(index) {
+                    case 0:
+                        this.props.goToHomePage();
+                        break;
+                    case 1:
+                        this.props.goToClaimInquiryPage(this.props.user.token);
+                        break;
+                    case 2:
+                        this.props.goToClaimHistoryPage(this.props.user.token);
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        this.props.goToChangePasswordPage();
+                        break;
+                    case 5:
+                        this.props.goToContactPage();
+                        break;
+                    case 6:
+                        this.logout();
+                        break;
+                    default:
+                        break;
+                }
                 break;
-            case 3:
+            case 'BROKER':
+                switch(index) {
+                    case 0:
+                        this.props.goToHomePage();
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        this.props.goToChangePasswordPage();
+                        break;
+                    case 4:
+                        this.props.goToContactPage();
+                        break;
+                    case 5:
+                        this.logout();
+                        break;
+                    default:
+                        break;
+                }
                 break;
-            case 4:
-                this.props.goToChangePasswordPage();
-                break;
-            case 5:
-                this.props.goToContactPage();
-                break;
-            case 6:
-                this.logout();
+            case 'HOSPITAL':
+                switch(index) {
+                    case 0:
+                        this.props.goToHomePage();
+                        break;
+                    case 1:
+                        this.props.goToClaimInquiryPage(this.props.user.token);
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        this.props.goToChangePasswordPage();
+                        break;
+                    case 4:
+                        this.props.goToContactPage();
+                        break;
+                    case 5:
+                        this.logout();
+                        break;
+                    default:
+                        break;
+                }
                 break;
             default:
                 break;
-        };
+        }
     }
 
     renderListItemChild(item, index) {
@@ -103,7 +277,7 @@ class SideMenu extends Component {
                             <Title>Danh mục</Title>
                         </Body>
                     </Header>
-                    { listMenu.map((item, index) => this.renderListItemChild(item, index))}
+                    { this.state.listMenu.map((item, index) => this.renderListItemChild(item, index)) }
                 </View>
             </View>
         );

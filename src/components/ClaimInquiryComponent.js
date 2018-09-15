@@ -1,10 +1,16 @@
 import React, { Component } from "react";
 import { View, Dimensions, ScrollView } from "react-native";
-import { Text, Header, Left, Button, Icon, Body, Title, Right, Card, CardItem } from "native-base";
+import { Text, Header, Left, Button, Icon, Body, Title, Right, Card, CardItem, Accordion, Container, Content, ListItem, List } from "native-base";
 import ModalFilterPicker from "react-native-modal-filter-picker";
 import { showRequestAlert } from "../actions/userActions";
 
 const { width, height } = Dimensions.get('window');
+
+const dataArray = [
+    { title: "First Element", content: "XXX" },
+    { title: "Second Element", content: "Lorem ipsum dolor sit amet" },
+    { title: "Third Element", content: "Lorem ipsum dolor sit amet" }
+];
 
 export default class ClaimInquiryComponent extends Component {
     constructor(props) {
@@ -105,7 +111,7 @@ export default class ClaimInquiryComponent extends Component {
                 lsInStoreCertificate.map((item, index) => {
                     lsCertificate.push({
                         key: item.certificateId,
-                        label: item.lastName
+                        label: item.lastName + (item.firstName ? ' ' + item.firstName : ''),
                     });
                 });
             }
@@ -116,13 +122,27 @@ export default class ClaimInquiryComponent extends Component {
             var certificateInfo = {};
             const inStoreCertificateInfo = nextProps.claimInquiry.certificateInfo;
             if (inStoreCertificateInfo) {
+                var birthday = inStoreCertificateInfo.dob;
+                var status = inStoreCertificateInfo.status;
+                if (status) {
+                    if (status.toUpperCase() === 'ACTIVE') {
+                        status = 'Đang hoạt động';
+                    } else if (status.toUpperCase() === 'TERMINATED') {
+                        status = 'Chấm dứt hợp đồng';
+                    } else if (status.toUpperCase() === 'INACTIVE') {
+                        status = 'Không hoạt động';
+                    }
+                }
                 certificateInfo = {
                     certificateNo: inStoreCertificateInfo.certificateId,
                     identityNo: inStoreCertificateInfo.idNo,
-                    certificateName: inStoreCertificateInfo.lastName,
-                    classCode: inStoreCertificateInfo.classcode,
-                    effectiveDateFrom: inStoreCertificateInfo.effectivefromdate,
-                    effectiveDateTo: inStoreCertificateInfo.effectivetodate
+                    certificateName: inStoreCertificateInfo.lastName + (inStoreCertificateInfo.firstName ? ' ' + inStoreCertificateInfo.firstName : ''),
+                    gender: inStoreCertificateInfo.gender,
+                    birthday: birthday,
+                    cardNo: inStoreCertificateInfo.cardNo,
+                    status: status,
+                    phone: inStoreCertificateInfo.phone,
+                    email: inStoreCertificateInfo.email
                 }
             }
             this.setState({
@@ -136,16 +156,11 @@ export default class ClaimInquiryComponent extends Component {
                 lsInStoreBenefit.map((item, index) => {
                     lsBenefit.push({
                         benefitCode: item.benefitCode,
-                        benefitName: item.benefitNameV,
-                        maxaType: item.maxaType,
+                        displayName: item.displayName,
                         maxaValue: item.maxaValue,
                         avMaxaValue: item.availableAmount,
-                        limitType: item.limitType,
                         limitValue: item.limitValue,
-                        avLimitValue: item.availableLimit,
-                        maxiType: item.maxiType,
-                        maxiValue: item.maxiValue,
-                        avMaxiValue: item.availableAmountMaxi,
+                        avLimitValue: item.availableLimit
                     });
                 });
             }
@@ -155,97 +170,296 @@ export default class ClaimInquiryComponent extends Component {
             });
         }
     }
-    
+
+    renderHeaderCertInfo(title, expanded) {
+        return (
+            <View
+                style={{
+                    flexDirection: "row",
+                    padding: 5,
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    backgroundColor: "#191DFF",
+                    height: 45,
+                }}
+            >
+                <View
+                    style={{
+                        flex: 8,
+                        justifyContent: 'center',
+                        alignContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Text style={{ fontFamily: 'Helvetica', fontWeight: "300", color: 'white', paddingLeft: 45 }}>THÔNG TIN CÁ NHÂN</Text>
+                </View>
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    {expanded ? <Icon style={{ color: "white" }} name="remove" /> : <Icon style={{ color: "black" }} name="add" />}
+                </View>
+            </View>
+        );
+    }
+    renderContentCertInfo(item) {
+        return (
+            <View
+                style={{ backgroundColor: 'white', borderWidth: 1, borderColor: '#b6b6b6', padding: 5, height: 400 }}
+            >
+                <Container>
+                    <Content>
+                        <List>
+                            <ListItem icon>
+                                <Left>
+                                    <Icon type={"Entypo"} name="man" />
+                                </Left>
+                                <Body>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "400" }}>Họ và tên:</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'right' }}>{ item.certificateName }</Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem icon>
+                                <Left>
+                                    <Icon type={"MaterialCommunityIcons"} name="gender-male-female" />
+                                </Left>
+                                <Body>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "400" }}>Giới tính:</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'right' }}>{ item.gender }</Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem icon>
+                                <Left>
+                                    <Icon type={"MaterialIcons"} name="date-range" />
+                                </Left>
+                                <Body>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "400" }}>Ngày sinh:</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'right' }}>{ item.birthday }</Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem icon>
+                                <Left>
+                                    <Icon type={"EvilIcons"} name="credit-card" />
+                                </Left>
+                                <Body>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "400" }}>Số CMT/Hộ chiếu:</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'right' }}>{ item.identityNo }</Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem icon>
+                                <Left>
+                                    <Icon name="card" />
+                                </Left>
+                                <Body>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "400" }}>Số thẻ:</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'right' }}>{ item.cardNo }</Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem icon>
+                                <Left>
+                                    <Icon type={"EvilIcons"} name="lock" />
+                                </Left>
+                                <Body>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "400" }}>Trạng thái:</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'right' }}>{ item.status }</Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem icon>
+                                <Left>
+                                    <Icon type={"Entypo"} name="mobile" />
+                                </Left>
+                                <Body>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "400" }}>Số điện thoại:</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'right' }}>{ item.phone }</Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem icon>
+                                <Left>
+                                    <Icon type={"EvilIcons"} name="envelope" />
+                                </Left>
+                                <Body>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "400" }}>Email:</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'right' }}>{ item.email }</Text>
+                                </Right>
+                            </ListItem>
+                        </List>
+                    </Content>
+                </Container>
+            </View>
+        );
+    }
+
     renderInfo() {
         if (this.state.showInfo) {
             const { certificateInfo } = this.state;
             return (
-                <View style={{ flex: 20 }}>
-                    <Text
-                        style={[ {
-                            fontFamily: 'Helvetica',
-                            fontSize: 18,
-                            fontWeight: "500",
-                            margin: 10,
-                        }, this.props.style ]}
-                    >Thông tin nhân viên</Text>
-                    <Card>
-                        <CardItem cardBody>
-                            <Body style={[ {padding: 5, margin: 5}, this.props.style ]}>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Mã số nhân viên: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.certificateNo }</Text>
-                                </View>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>CMND: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.identityNo }</Text>
-                                </View>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Họ tên nhân viên: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.certificateName }</Text>
-                                </View>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Nhóm: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.classCode }</Text>
-                                </View>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Hiệu lực từ: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.effectiveDateFrom }</Text>
-                                </View>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Hiệu lực đến: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.effectiveDateTo }</Text>
-                                </View>
-                            </Body>
-                        </CardItem>
-                    </Card>
+                <View style={{ flex: 10, marginTop: 10, marginBottom: 10, }}>
+                    <View style={{ borderBottomColor: 'black', borderBottomWidth: 1, marginBottom: 10 }}></View>
+                    <Content>
+                        <Accordion
+                            dataArray={[certificateInfo]}
+                            renderContent={this.renderContentCertInfo}
+                            renderHeader={this.renderHeaderCertInfo}
+                        />
+                    </Content>
                 </View>
             );
-        } else {
-            return null;
         }
+        return null;
+    }
+
+    renderHeaderBenefit(item, expanded) {
+        return (
+            <View
+                style={{
+                    flexDirection: "row",
+                    padding: 5,
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    backgroundColor: "white",
+                    height: 45,
+                    borderWidth: 1,
+                    borderColor: '#b6b6b6'
+                }}
+            >
+                <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "300", color: 'black' }}>{ item.displayName }</Text>
+                {expanded ? <Icon style={{ color: "red" }} name="remove" /> : <Icon style={{ color: "green" }} name="add" />}
+            </View>
+        );
+    }
+    renderContentBenefit(item) {
+        var displayLimit = false;
+        var limitValue = item.limitValue;
+        var avLimitValue = item.avLimitValue;
+        if (limitValue && avLimitValue) {
+            displayLimit = true;
+        }
+        return (
+            <View
+                style={{ backgroundColor: 'white', borderWidth: 1, borderColor: '#b6b6b6', padding: 5 }}
+            >
+                <View
+                    style={{ flexDirection: 'row' }}
+                >
+                    <View
+                        style={{ flex: 4, alignContent: 'center', alignItems: 'center' }}
+                    >
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "500" }}>Quyền lợi tối đa</Text>
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'center' }}>{item.maxaValue ? (item.maxaValue / 1000000) : 0}</Text>
+                    </View>
+                    <View
+                        style={{ flex: 4, alignContent: 'center', alignItems: 'center' }}
+                    >
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "500" }}>Quyền lợi còn lại</Text>
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'center' }}>{item.avMaxaValue ? (item.avMaxaValue / 1000000) : 0}</Text>
+                    </View>
+                    <View
+                        style={{ flex: 2, alignContent: 'center', alignItems: 'center' }}
+                    >
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 12, fontWeight: "500" }}>Đơn vị</Text>
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'center' }}>Triệu/năm</Text>
+                    </View>
+                </View>
+                { displayLimit ?
+                    (<View
+                        style={{ flexDirection: 'row' }}
+                    >
+                        <View
+                            style={{ flex: 4, alignContent: 'center', alignItems: 'center' }}
+                        >
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'center' }}>{ item.limitValue }</Text>
+                        </View>
+                        <View
+                            style={{ flex: 4, alignContent: 'center', alignItems: 'center' }}
+                        >
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'center' }}>{ item.avLimitValue }</Text>
+                        </View>
+                        <View
+                            style={{ flex: 2, alignContent: 'center', alignItems: 'center' }}
+                        >
+                            <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'center' }}>Ngày/năm</Text>
+                        </View>
+                    </View>) : null }
+            </View>
+        );
+    }
+
+    renderBenefitLimit(item) {
+        var limitType = item.limitType;
+        var limitValue = item.limitValue;
+        if (limitType && limitValue) {
+            return (
+                <View
+                    style={{ flexDirection: 'row' }}
+                    disabled={!isDisplayLimit}
+                >
+                    <View
+                        style={{ flex: 4, alignContent: 'center', alignItems: 'center' }}
+                    >
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'center' }}>{ item.limitValue }</Text>
+                    </View>
+                    <View
+                        style={{ flex: 4, alignContent: 'center', alignItems: 'center' }}
+                    >
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'center' }}>{ item.avLimitValue }</Text>
+                    </View>
+                    <View
+                        style={{ flex: 2, alignContent: 'center', alignItems: 'center' }}
+                    >
+                        <Text style={{ fontFamily: 'Helvetica', fontSize: 12, color: 'black', textAlign: 'center' }}>Ngày/năm</Text>
+                    </View>
+                </View>
+            );
+        }
+        return null;
     }
 
     renderDetail() {
         if (this.state.showDetail) {
             const { lsBenefit, style } = this.state;
             return (
-                <View style={{ flex: 50 }}>
-                    <Text
-                        style={[ {
-                            fontFamily: 'Helvetica',
-                            fontSize: 18,
-                            fontWeight: "500",
-                            margin: 10,
-                        }, this.props.style ]}
-                    >Thông tin quyền lợi</Text>
-                        {
-                            lsBenefit.map((item, index) => {
-                                return <Card key={item.benefitCode}>
-                                    <CardItem cardBody>
-                                        <Body style={[ {padding: 5, margin: 5}, style ]}>
-                                            <View>
-                                                <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ "Quyền lợi BH: " + item.benefitName }</Text>
-                                            </View>
-                                            { item.maxaType ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]} >{ "- " + item.maxaType }</Text></View> : null }
-                                            { item.maxaValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Tổng: " + item.maxaValue }</Text></View> : null }
-                                            { item.avMaxaValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Còn: " + item.avMaxaValue }</Text></View> : null }
-                                            { item.limitType ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ "- " + item.limitType }</Text></View> : null }
-                                            { item.limitValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Tổng: " + item.limitValue }</Text></View> : null }
-                                            { item.avLimitValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Còn: " + item.avLimitValue }</Text></View> : null }
-                                            { item.maxiType ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ "- " + item.maxiType }</Text></View> : null }
-                                            { item.maxiValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Tổng: " + item.maxiValue }</Text></View> : null }
-                                            { item.avMaxiValue ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 10 }, this.props.style ]}>{ "+ Còn: " + item.avMaxiValue }</Text></View> : null }
-                                        </Body>
-                                    </CardItem>
-                                </Card>
-                            })
-                        }
+                <View style={{ flex: 50, marginTop: 10, marginBottom: 10, }}>
+                    <Content>
+                        <View
+                            style={{
+                                height: 45,
+                                backgroundColor: '#191DFF',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <Text style={{ fontFamily: 'Helvetica', fontWeight: "300", color: 'white' }}>THÔNG TIN QUYỀN LỢI</Text>
+                        </View>
+                        <Accordion
+                            dataArray={lsBenefit}
+                            renderContent={this.renderContentBenefit}
+                            renderHeader={this.renderHeaderBenefit}
+                        />
+                    </Content>
                 </View>
             );
-        } else {
-            return null;
         }
+        return null;
     }
 
     render() {
@@ -254,21 +468,21 @@ export default class ClaimInquiryComponent extends Component {
                 <Header>
                     <Left>
                         <Button transparent onPress={() => {
-                            this.props.navigation.toggleDrawer();
+                            this.props.goToHomePage();
                         }} >
-                            <Icon name="menu" />
+                            <Icon name="arrow-back" />
                         </Button>
                     </Left>
                     <Body>
-                        <Title>Truy vấn</Title>
+                        <Title>Thông tin</Title>
                     </Body>
                     <Right>
                     </Right>
                 </Header>
                 <ScrollView>
                     <View style={{ flex: 1, margin: 10 }}>
-                        <View style={{ flex: 10 }}>
-                            <Button full transparent primary
+                        <View style={{ flex: 10, marginBottom: 5, }}>
+                            <Button full transparent bordered primary
                                 onPress={() => this.setState({ visiblePol: true })}
                             >
                                 <Text
@@ -292,8 +506,8 @@ export default class ClaimInquiryComponent extends Component {
                                 noResultsText="Không có kết quả"
                             />
                         </View>
-                        <View style={{ flex: 10 }}>
-                            <Button full transparent primary
+                        <View style={{ flex: 10, marginBottom: 5, }}>
+                            <Button full transparent bordered primary
                                 onPress={() => this.setState({ visibleCert: true })}
                             >
                                 <Text
@@ -317,7 +531,7 @@ export default class ClaimInquiryComponent extends Component {
                                 noResultsText="Không có kết quả"
                             />
                         </View>
-                        <View style={{ flex: 10 }}>
+                        <View style={{ flex: 10, marginBottom: 5, }}>
                             <Button full danger
                                 onPress={() => this.inquiryData()}
                             >

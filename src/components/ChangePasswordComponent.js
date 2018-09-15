@@ -45,9 +45,9 @@ export default class ClaimInquiryComponent extends Component {
                 <Header>
                     <Left>
                         <Button transparent onPress={() => {
-                            this.props.navigation.toggleDrawer();
+                            this.props.goToHomePage();
                         }} >
-                            <Icon name="menu" />
+                            <Icon name="arrow-back" />
                         </Button>
                     </Left>
                     <Body>
@@ -60,7 +60,7 @@ export default class ClaimInquiryComponent extends Component {
                     <View style={{ flex: 1, margin: 10 }}>
                         <Item>
                             <Input
-                                placeholder="Mậu khẩu hiện tại"
+                                placeholder="Mật khẩu hiện tại"
                                 autoCapitalize="none"
                                 secureTextEntry={true}
                                 onChangeText={(value) => {
@@ -126,7 +126,7 @@ export default class ClaimInquiryComponent extends Component {
                                         fontSize: 13,
                                         fontFamily: 'Helvetica',
                                 }}>
-                                    GỬI
+                                    XÁC NHẬN
                                 </Text>
                             </TouchableOpacity>
                         </View>

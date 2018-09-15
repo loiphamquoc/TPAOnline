@@ -21,6 +21,7 @@ export default class ClaimHistoryComponent extends Component {
             showInfo: false,
             certificateInfo: {},
             showDetail: false,
+            noRecordFound: false,
             lsClaimHistory: []
         };
     }
@@ -105,7 +106,7 @@ export default class ClaimHistoryComponent extends Component {
                 lsInStoreCertificate.map((item, index) => {
                     lsCertificate.push({
                         key: item.certificateId,
-                        label: item.lastName
+                        label: item.cardNo + "-" + item.lastName + (item.firstName ? ' ' + item.firstName : ''),
                     });
                 });
             }
@@ -119,8 +120,9 @@ export default class ClaimHistoryComponent extends Component {
                 certificateInfo = {
                     certificateNo: inStoreCertificateInfo.certificateId,
                     identityNo: inStoreCertificateInfo.idNo,
-                    certificateName: inStoreCertificateInfo.lastName,
+                    certificateName: inStoreCertificateInfo.lastName + (inStoreCertificateInfo.firstName ? ' ' + inStoreCertificateInfo.firstName : ''),
                     classCode: inStoreCertificateInfo.classcode,
+                    cardNo: inStoreCertificateInfo.cardNo,
                     effectiveDateFrom: inStoreCertificateInfo.effectivefromdate,
                     effectiveDateTo: inStoreCertificateInfo.effectivetodate
                 }
@@ -134,20 +136,49 @@ export default class ClaimHistoryComponent extends Component {
             const lsInStoreClaimHistory = nextProps.claimHistory.lsClaimHistory;
             if (lsInStoreClaimHistory) {
                 lsInStoreClaimHistory.map((item, index) => {
+                    var claimDate = item.claimdate;
+                    if (claimDate) {
+                        var tmpClaimDate = new Date(claimDate);
+                        if (tmpClaimDate) {
+                            var day = tmpClaimDate.getDate();
+                            if (day < 10) {
+                                day = '0' + day;
+                            }
+                            var month = (tmpClaimDate.getMonth() + 1);
+                            if (month < 10) {
+                                month = '0' + month;
+                            }
+                            var year = tmpClaimDate.getFullYear();
+                            claimDate = day + '/' + month + '/' + year;
+                        }
+                    }
+                    var direct = 'Không';
+                    if (item.direct && item.direct.toUpperCase() === 'YES') {
+                        direct = 'Có';
+                    }
+                    var incurredAmount = item.incurredamount;
+                    if (incurredAmount) {
+                        incurredAmount = incurredAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    }
+                    var paidAmount = item.paidamount;
+                    if (paidAmount) {
+                        paidAmount = paidAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    }
                     lsClaimHistory.push({
                         benefitName: item.benefitNameV,
-                        claimDate: item.claimdate,
+                        claimDate: claimDate,
                         claimNo: item.claimno,
                         claimStatus: item.claimstatus,
-                        direct: item.direct,
-                        incurredAmount: item.incurredamount,
-                        paidAmount: item.paidamount,
+                        direct: direct,
+                        incurredAmount: incurredAmount,
+                        paidAmount: paidAmount,
                     });
                 });
             }
             this.setState({
                 lsClaimHistory: lsClaimHistory,
-                showDetail: lsClaimHistory.length > 0
+                showDetail: lsClaimHistory.length > 0,
+                noRecordFound: lsClaimHistory
             });
         }
     }
@@ -157,6 +188,7 @@ export default class ClaimHistoryComponent extends Component {
             const { certificateInfo } = this.state;
             return (
                 <View style={{ flex: 20 }}>
+                    <View style={{ borderBottomColor: 'black', borderBottomWidth: 1, marginBottom: 10 }}></View>
                     <Text
                         style={[ {
                             fontFamily: 'Helvetica',
@@ -169,28 +201,60 @@ export default class ClaimHistoryComponent extends Component {
                         <CardItem cardBody>
                             <Body style={[ {padding: 5, margin: 5}, this.props.style ]}>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Mã số nhân viên: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.certificateNo }</Text>
+                                    <View style={{ flex: 3, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Mã số:</Text>
+                                    </View>
+                                    <View style={{ flex: 7, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'right' }, this.props.style ]}>{ certificateInfo.certificateNo }</Text>
+                                    </View>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>CMND: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.identityNo }</Text>
+                                    <View style={{ flex: 3, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'left', fontWeight: "400" }, this.props.style ]}>CMND:</Text>
+                                    </View>
+                                    <View style={{ flex: 7, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'right' }, this.props.style ]}>{ certificateInfo.identityNo }</Text>
+                                    </View>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Họ tên nhân viên: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.certificateName }</Text>
+                                    <View style={{ flex: 3, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Họ tên:</Text>
+                                    </View>
+                                    <View style={{ flex: 7, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'right' }, this.props.style ]}>{ certificateInfo.certificateName }</Text>
+                                    </View>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Nhóm: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.classCode }</Text>
+                                    <View style={{ flex: 3, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Nhóm:</Text>
+                                    </View>
+                                    <View style={{ flex: 7, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'right' }, this.props.style ]}>{ certificateInfo.classCode }</Text>
+                                    </View>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Hiệu lực từ: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.effectiveDateFrom }</Text>
+                                    <View style={{ flex: 3, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Số thẻ:</Text>
+                                    </View>
+                                    <View style={{ flex: 7, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'right' }, this.props.style ]}>{ certificateInfo.cardNo }</Text>
+                                    </View>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[ { fontFamily: 'Helvetica', fontWeight: "400" }, this.props.style ]}>Hiệu lực đến: </Text>
-                                    <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ certificateInfo.effectiveDateTo }</Text>
+                                    <View style={{ flex: 3, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Hiệu lực từ:</Text>
+                                    </View>
+                                    <View style={{ flex: 7, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'right' }, this.props.style ]}>{ certificateInfo.effectiveDateFrom }</Text>
+                                    </View>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <View style={{ flex: 3, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Hiệu lực đến:</Text>
+                                    </View>
+                                    <View style={{ flex: 7, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                        <Text style={[ { fontFamily: 'Helvetica', textAlign: 'right' }, this.props.style ]}>{ certificateInfo.effectiveDateTo }</Text>
+                                    </View>
                                 </View>
                             </Body>
                         </CardItem>
@@ -198,15 +262,9 @@ export default class ClaimHistoryComponent extends Component {
                 </View>
             );
         } else {
-            return null;
-        }
-    }
-
-    renderDetail() {
-        if (this.state.showDetail) {
-            const { lsClaimHistory, style } = this.state;
             return (
-                <View style={{ flex: 50 }}>
+                <View style={{ flex: 20 }}>
+                    <View style={{ borderBottomColor: 'black', borderBottomWidth: 1, marginBottom: 10 }}></View>
                     <Text
                         style={[ {
                             fontFamily: 'Helvetica',
@@ -214,31 +272,123 @@ export default class ClaimHistoryComponent extends Component {
                             fontWeight: "500",
                             margin: 10,
                         }, this.props.style ]}
-                    >Bảng chi tiết</Text>
-                        {
-                            lsClaimHistory.map((item, index) => {
-                                return <Card key={item.claimNo}>
-                                    <CardItem cardBody>
-                                        <Body style={[ {padding: 5, margin: 5}, style ]}>
-                                            <View style={{ marginBottom: 5 }}>
-                                                <Text style={[ { fontFamily: 'Helvetica' }, this.props.style ]}>{ "Số đơn: " + item.claimNo }</Text>
-                                            </View>
-                                            { item.claimDate ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]} >{ "- Ngày nhận hồ sơ: " + item.claimDate }</Text></View> : null }
-                                            { item.benefitName ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ "- Quyền lợi BH: " + item.benefitName }</Text></View> : null }
-                                            { item.incurredAmount ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ "- Số tiền YC bồi thường: " + item.incurredAmount }</Text></View> : null }
-                                            { item.paidAmount ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ "- Số tiền bồi thường: " + item.paidAmount }</Text></View> : null }
-                                            { item.direct ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ "- Bảo lãnh viện phí: " + item.direct }</Text></View> : null }
-                                            { item.claimStatus ? <View><Text style={[ { fontFamily: 'Helvetica', marginLeft: 5 }, this.props.style ]}>{ "- Tình trạng hồ sơ: " + item.claimStatus }</Text></View> : null }
-                                        </Body>
-                                    </CardItem>
-                                </Card>
-                            })
-                        }
+                    >Không tìm thấy kết quả phù hợp</Text>
                 </View>
             );
-        } else {
-            return null;
         }
+    }
+
+    renderDetail() {
+        if (this.state.showDetail) {
+            const { lsClaimHistory, style } = this.state;
+            if (lsClaimHistory && lsClaimHistory.lenght > 0) {
+                return (
+                    <View style={{ flex: 50 }}>
+                        <Text
+                            style={[ {
+                                fontFamily: 'Helvetica',
+                                fontSize: 18,
+                                fontWeight: "500",
+                                margin: 10,
+                            }, this.props.style ]}
+                        >Bảng chi tiết</Text>
+                            {
+                                lsClaimHistory.map((item, index) => {
+                                    return <Card key={item.claimNo}>
+                                        <CardItem cardBody>
+                                            <Body style={[ {padding: 5, margin: 5}, style ]}>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <View style={{ flex: 4, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 16, textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Số đơn:</Text>
+                                                    </View>
+                                                    <View style={{ flex: 6, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 14, textAlign: 'right' }, this.props.style ]}>{ item.claimNo }</Text>
+                                                    </View>
+                                                </View>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <View style={{ flex: 4, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 16, textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Ngày nhận hồ sơ:</Text>
+                                                    </View>
+                                                    <View style={{ flex: 6, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 14, textAlign: 'right' }, this.props.style ]}>{ item.claimDate }</Text>
+                                                    </View>
+                                                </View>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <View style={{ flex: 4, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 16, textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Quyền lợi BH:</Text>
+                                                    </View>
+                                                    <View style={{ flex: 6, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 14, textAlign: 'right' }, this.props.style ]}>{ item.benefitName }</Text>
+                                                    </View>
+                                                </View>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <View style={{ flex: 4, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 16, textAlign: 'left', fontWeight: "400" }, this.props.style ]}>YC bồi thường:</Text>
+                                                    </View>
+                                                    <View style={{ flex: 6, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 14, textAlign: 'right' }, this.props.style ]}>{ item.incurredAmount }</Text>
+                                                    </View>
+                                                </View>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <View style={{ flex: 4, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 16, textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Bồi thường:</Text>
+                                                    </View>
+                                                    <View style={{ flex: 6, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 14, textAlign: 'right' }, this.props.style ]}>{ item.paidAmount }</Text>
+                                                    </View>
+                                                </View>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <View style={{ flex: 4, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 16, textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Bảo lãnh viện phí:</Text>
+                                                    </View>
+                                                    <View style={{ flex: 6, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 14, textAlign: 'right' }, this.props.style ]}>{ item.direct }</Text>
+                                                    </View>
+                                                </View>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <View style={{ flex: 4, alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 16, textAlign: 'left', fontWeight: "400" }, this.props.style ]}>Tình trạng hồ sơ:</Text>
+                                                    </View>
+                                                    <View style={{ flex: 6, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                                        <Text style={[ { fontFamily: 'Helvetica', fontSize: 14, textAlign: 'right' }, this.props.style ]}>{ item.claimStatus }</Text>
+                                                    </View>
+                                                </View>
+                                            </Body>
+                                        </CardItem>
+                                    </Card>
+                                })
+                            }
+                    </View>
+                );
+            }
+        }
+        const { noRecordFound } = this.state;
+        if (noRecordFound) {
+            return (
+                <View style={{ flex: 20 }}>
+                    <Text
+                        style={[ {
+                            fontFamily: 'Helvetica',
+                            fontSize: 18,
+                            fontWeight: "500",
+                            margin: 10,
+                        }, this.props.style ]}
+                    >Không tìm thấy kết quả phù hợp</Text>
+                </View>
+            );
+            this.setState({
+                lsClaimHistory: lsClaimHistory,
+                showDetail: lsClaimHistory.length > 0,
+                noRecordFound: lsClaimHistory
+            });
+        }
+        return null;
+
+        this.setState({
+            lsClaimHistory: lsClaimHistory,
+            showDetail: lsClaimHistory.length > 0,
+            noRecordFound: lsClaimHistory
+        });
     }
 
     render() {
@@ -247,9 +397,9 @@ export default class ClaimHistoryComponent extends Component {
                 <Header>
                     <Left>
                         <Button transparent onPress={() => {
-                            this.props.navigation.toggleDrawer();
+                            this.props.goToHomePage();
                         }} >
-                            <Icon name="menu" />
+                            <Icon name="arrow-back" />
                         </Button>
                     </Left>
                     <Body>
@@ -260,8 +410,8 @@ export default class ClaimHistoryComponent extends Component {
                 </Header>
                 <ScrollView>
                     <View style={{ flex: 1, margin: 10 }}>
-                        <View style={{ flex: 10 }}>
-                            <Button full transparent primary
+                        <View style={{ flex: 10, marginBottom: 5, }}>
+                            <Button full transparent bordered primary
                                 onPress={() => this.setState({ visiblePol: true })}
                             >
                                 <Text
@@ -285,8 +435,8 @@ export default class ClaimHistoryComponent extends Component {
                                 noResultsText="Không có kết quả"
                             />
                         </View>
-                        <View style={{ flex: 10 }}>
-                            <Button full transparent primary
+                        <View style={{ flex: 10, marginBottom: 5, }}>
+                            <Button full transparent bordered primary
                                 onPress={() => this.setState({ visibleCert: true })}
                             >
                                 <Text
@@ -310,7 +460,7 @@ export default class ClaimHistoryComponent extends Component {
                                 noResultsText="Không có kết quả"
                             />
                         </View>
-                        <View style={{ flex: 10 }}>
+                        <View style={{ flex: 10, marginBottom: 5, }}>
                             <Button full danger
                                 onPress={() => this.inquiryData()}
                             >
@@ -323,7 +473,7 @@ export default class ClaimHistoryComponent extends Component {
                                     ]}>Truy vấn</Text>
                             </Button>
                         </View>
-                        { this.renderInfo() }
+                        {/* { this.renderInfo() } */}
                         { this.renderDetail() }
                     </View>
                 </ScrollView>

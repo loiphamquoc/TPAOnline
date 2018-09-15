@@ -3,7 +3,8 @@ import LoginComponent from "../components/LoginComponent";
 import { LOGIN } from "../actions/actionTypes";
 
 const mapStateToProps = (state) => {
-    const { user } = state;
+    const { userReducers } = state;
+    const user = userReducers;
     return {
         user
     };

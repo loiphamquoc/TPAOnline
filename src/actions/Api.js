@@ -139,6 +139,51 @@ export function doGetLsClaimHistory(criteria) {
     return response;
 }
 
+export function doGetLsHospitalAddressData(criteria) {
+    const url = `${baseUrl}/hospital/getHospitalAddressData`;
+    const response = fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': criteria.token,
+        },
+        body: JSON.stringify({
+            '_state': criteria.stateCode,
+            '_district': criteria.districtCode,
+            '_ward': criteria.wardCode,
+        })
+    }).then(response => {
+        return response;
+    }).catch(err => {
+        return err;
+    });
+    return response;
+}
+
+export function doGetLsHospitalData(criteria) {
+    const url = `${baseUrl}/hospital/loadHospitalListData`;
+    const response = fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': criteria.token,
+        },
+        body: JSON.stringify({
+            '_state': criteria.stateCode,
+            '_district': criteria.districtCode,
+            '_ward': criteria.wardCode,
+            '_txtSearch': criteria.hospitalCode,
+        })
+    }).then(response => {
+        return response;
+    }).catch(err => {
+        return err;
+    });
+    return response;
+}
+
 export function doChangePassword(data) {
     const url = `${baseUrl}/user/saveChangePassword`;
     const response = fetch(url, {

@@ -2,7 +2,11 @@ import {
     SET_GLOBAL_INDICATOR_VISIBILITY,
 } from '../actions/actionTypes'  
 
-function indicator(state = {}, action) {
+const INITIAL_STATE = {
+    showGlobalIndicator: false
+};
+
+const indicatorReducers = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case SET_GLOBAL_INDICATOR_VISIBILITY:
             return {
@@ -14,4 +18,4 @@ function indicator(state = {}, action) {
     }
 }
 
-export default { indicator, app: { showGlobalIndicator: false } }
+export default indicatorReducers;

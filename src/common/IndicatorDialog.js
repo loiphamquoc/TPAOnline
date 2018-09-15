@@ -4,11 +4,12 @@
  * Copyright (c) 2018 Jeremy
  */
 
-import React from 'react'
-import {View, Text, Modal} from 'react-native'
-import Spinner from 'react-native-spinkit'
+import React, { Component } from 'react';
+import {View, Text, Modal} from 'react-native';
+import Spinner from 'react-native-spinkit';
+import { connect } from "react-redux";
 
-export default class IndicatorDialog extends React.Component {
+class IndicatorDialog extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -17,7 +18,8 @@ export default class IndicatorDialog extends React.Component {
     }
 
     render() {
-        const {message, showGlobalIndicator} = this.props;
+        // const {message, showGlobalIndicator} = this.props;
+        const { showGlobalIndicator } = this.props;
         return (
             <View>
                 <Modal animationType='fade'
@@ -30,7 +32,7 @@ export default class IndicatorDialog extends React.Component {
                                      size={60}
                                      type='ThreeBounce'
                                      color="rgb(194,27,23)"/>
-                            <Text>{message}</Text>
+                            {/* <Text>{message}</Text> */}
                         </View>
                     </View>
                 </Modal>
@@ -84,3 +86,17 @@ var styles = {
         backgroundColor: 'orange'
     },
 }
+
+const mapStateToProps = (state) => {
+    const { indicator } = state;
+    return {
+        indicator
+    };
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(IndicatorDialog);

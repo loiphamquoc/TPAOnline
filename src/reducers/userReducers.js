@@ -6,6 +6,7 @@ const INITIAL_STATE = {
     loginIndicator: false,
     logoutIndicator: false,
     loginType: null,
+    showGlobalIndicator: false
 };
 
 const userReducers = (state = INITIAL_STATE, action) => {

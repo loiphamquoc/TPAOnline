@@ -12,6 +12,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        goToHomePage: () => dispatch({ type: 'push', routeName: 'Home' }),
         onChangePassword: (data) => dispatch({ type: CHANGE_PASSWORD , payload: data}),
     }
 }

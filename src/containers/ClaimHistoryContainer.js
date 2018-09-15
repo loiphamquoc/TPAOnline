@@ -14,6 +14,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        goToHomePage: () => dispatch({ type: 'push', routeName: 'Home' }),
         onSelectPolicy: (payload) => dispatch({ type: CLAIM_HISTORY_GET_CERTIFICATE_LIST, payload }),
         onInquiryCertInfo: (payload) => dispatch({ type: CLAIM_HISTORY_GET_CERTIFICATE_INFO, payload }),
     }

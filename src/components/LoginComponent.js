@@ -1,45 +1,54 @@
 import React, { Component } from "react";
-import { View, StyleSheet, ImageBackground, TouchableOpacity } from "react-native";
+import { View, StyleSheet, ImageBackground, TouchableOpacity, AsyncStorage } from "react-native";
 import { Text, Item, Label, Input, Picker, Icon  } from "native-base";
 import IndicatorDialog from "../common/IndicatorDialog";
-
-const pickerValues = [
-    {
-        label: 'Nhân viên',
-        value: 'CERTIFICATE'
-    },
-    {
-        label: 'Nhân sự',
-        value: 'HR_POLICY'
-    },
-    {
-        label: 'Nhà bảo hiểm',
-        value: 'TPA'
-    },
-    {
-        label: 'Môi giới bảo hiểm',
-        value: 'BROKER'
-    },
-    {
-        label: 'Bệnh viện',
-        value: 'HOSPITAL'
-    }
-];
 
 export default class LoginComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: 'tpa',
-            password: 'admin',
-            loginType: 'TPA',
+            username: 'loiphamquoc@gmail.com',
+            password: '123456',
+            loginType: 'CERTIFICATE',
+            language: this.props.user.language,
+            listRole: [
+                {
+                    label: 'Nhân viên',
+                    value: 'CERTIFICATE'
+                },
+                // {
+                //     label: 'Nhân sự',
+                //     value: 'HR_POLICY'
+                // },
+                // {
+                //     label: 'Nhà bảo hiểm',
+                //     value: 'TPA'
+                // },
+                // {
+                //     label: 'Môi giới bảo hiểm',
+                //     value: 'BROKER'
+                // },
+                // {
+                //     label: 'Bệnh viện',
+                //     value: 'HOSPITAL'
+                // }
+            ]
         };
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.user) {
+        }
+    }
+
+    componentDidMount() {
     }
     
     onLogin() {
         const { username, password, loginType } = this.state;
         if (!username || !password) {
-            alert('Vui lòng nhập Tên đăng nhập và Mật khẩu!');
+            var error = 'Vui lòng nhập Tài khoản và mật khẩu!';
+            alert(error);
             return;
         }
         this.props.onLoginAction({
@@ -84,7 +93,7 @@ export default class LoginComponent extends Component {
                                     onValueChange={(value, index) => this.setState({ loginType: value })}
                                     headerBackButtonText={"Trở về"}
                                 >
-                                    { pickerValues.map((item, index) => {
+                                    { this.state.listRole.map((item, index) => {
                                         return <Picker.Item key={item.value} label={item.label} value={item.value} />
                                     })}
                                 </Picker>
