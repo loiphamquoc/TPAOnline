@@ -6,7 +6,7 @@
 
 import React, { Component } from 'react';
 import {View, Text, Modal} from 'react-native';
-import Spinner from 'react-native-spinkit';
+// import Spinner from 'react-native-spinkit';
 import { connect } from "react-redux";
 
 class IndicatorDialog extends Component {
@@ -28,10 +28,10 @@ class IndicatorDialog extends Component {
                        onRequestClose={() => {console.log('android click back')}}>
                     <View style={[styles.container, {backgroundColor: 'rgba(0, 0, 0, 0.2)'}]}>
                         <View style={[styles.innerContainer]}>
-                            <Spinner isVisible={true}
+                            {/* <Spinner isVisible={true}
                                      size={60}
                                      type='ThreeBounce'
-                                     color="rgb(194,27,23)"/>
+                                     color="rgb(194,27,23)"/> */}
                             {/* <Text>{message}</Text> */}
                         </View>
                     </View>

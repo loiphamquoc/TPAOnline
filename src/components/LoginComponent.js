@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { View, StyleSheet, ImageBackground, TouchableOpacity, AsyncStorage } from "react-native";
 import { Text, Item, Label, Input, Picker, Icon  } from "native-base";
-import IndicatorDialog from "../common/IndicatorDialog";
 
 export default class LoginComponent extends Component {
     constructor(props) {
@@ -59,10 +58,8 @@ export default class LoginComponent extends Component {
     }
 
     render() {
-        const { showGlobalIndicator } = this.props;
         return (
                 <View style={styles.wrapper} >
-                    {showGlobalIndicator ? <IndicatorDialog message={'Vui lòng chờ...'}/> : null}
                     <ImageBackground style={styles.container} source={require('../../assets/images/logoMain_new.jpg')}>
                         <View style={styles.formContainer}>
                             <View style={{flexDirection: 'row', margin: 10, justifyContent: 'center', alignItems: 'center'}}>

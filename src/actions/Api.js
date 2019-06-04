@@ -10,7 +10,7 @@ export function doLogin(user) {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
         },
         body: userLogin
     }).then(response => {
